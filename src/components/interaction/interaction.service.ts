@@ -5,6 +5,7 @@ import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
 import { MODEL_COLLECTION_DICTIONARY } from '../constants/model-collection.dictionary';
 import { ConfigService } from '@nestjs/config';
+import { IChromaData } from './models/choma-data.interface';
 
 @Injectable()
 export class InteractionService {
@@ -24,6 +25,7 @@ export class InteractionService {
 
     public async postInteraction(userId: string, userMessage: string, model: string): Promise<string> {
         this._loggerService.info(`[postInteraction] - Init post interaction - UserId: ${userId} - UserMessage: ${userMessage.slice(0, 10)}...`)
+        this._loggerService.info((`[postInteraction] - Init time: ${new Date().toISOString()}`));
         await this.ensureCollection(model);
         const response = await this.sendToOllama(userId, userMessage, model);
         const fullTurn = `User: ${userMessage}\nSofia: ${response}`;
@@ -42,6 +44,7 @@ export class InteractionService {
             ids: [uuidv4()],
         });
 
+        this._loggerService.info((`[postInteraction] - Finish time: ${new Date().toISOString()}`));
         return response;
     }
 
@@ -68,7 +71,36 @@ export class InteractionService {
         return data.embedding;
     }
 
-    private async getContext(userId: string, query: string): Promise<string[]> {
+    // private async getContext(userId: string, query: string): Promise<string[]> {
+    //     this._loggerService.info(`[getContext] - userId: ${userId} - query: ${query.slice(0, 10)}...`)
+    //     const embedding = await this.getEmbedding(query);
+    //     if (!Array.isArray(embedding) || embedding.length < 10) {
+    //         this._loggerService.warn(`[getContext] - Embeding invalido`)
+    //     };
+    //     this._loggerService.info(`[getContext] - embeding succesful`);
+
+    //     const collection = await this.chroma.getCollection({ name: this.collectionName });
+    //     this._loggerService.info(`[getContext] - chromaCollection ${collection}`);
+
+    //     const results = await collection.query({
+    //         queryEmbeddings: [embedding],
+    //         nResults: 5,
+    //         where: { userId },
+    //     });
+
+    //     const docs = results?.documents?.[0] || [];
+    //     const metas = results?.metadatas?.[0] || [];
+
+    //     console.log(docs.map((doc, i) => ({
+    //         text: doc,
+    //         timestamp: metas[i]?.createdAt || metas[i]?.timestamp || 'unknown',
+    //       })))
+
+
+    //     return results?.documents?.[0] || [];
+    // }
+
+    private async getContext(userId: string, query: string): Promise<IChromaData[]> {
         this._loggerService.info(`[getContext] - userId: ${userId} - query: ${query.slice(0, 10)}...`)
         const embedding = await this.getEmbedding(query);
         if (!Array.isArray(embedding) || embedding.length < 10) {
@@ -85,13 +117,28 @@ export class InteractionService {
             where: { userId },
         });
 
-        return results?.documents?.[0] || [];
+        const docs = results?.documents?.[0] || [];
+        const metas = results?.metadatas?.[0] || [];
+
+        console.log(docs.map((doc, i) => ({
+            text: doc,
+            timestamp: metas[i]?.createdAt || metas[i]?.timestamp || 'unknown',
+        })))
+
+
+        return docs.map((doc, i) => ({
+            text: doc,
+            timestamp: metas[i]?.createdAt || metas[i]?.timestamp || 'unknown',
+        })) || [];
     }
 
     private async sendToOllama(userId: string, prompt: string, model: string): Promise<string> {
         this._loggerService.info(`[sendToOllama] - Init post interaction - UserId: ${userId} - UserMessage: ${prompt.slice(0, 10)}... - Model: ${model}`)
         const contextDocs = await this.getContext(userId, prompt);
-        const contextBlock = contextDocs.map((doc) => `- ${doc}`).join('\n');
+        const contextBlock = contextDocs.map(({ text, timestamp }) =>
+            `- (${timestamp}) ${text}`
+        ).join('\n');
+
 
         const fullPrompt = `
         Reminder: MEMORY CONTEXT is for reference only. Respond only to USER.
