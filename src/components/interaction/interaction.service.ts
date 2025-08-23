@@ -12,10 +12,6 @@ export class InteractionService {
     private chroma = new ChromaClient();
     private collectionName = '';
 
-    // async onModuleInit() {
-    //     await this.ensureCollection();
-    // }
-
     constructor(
         private readonly _loggerService: LoggerService,
         private readonly _configService: ConfigService
@@ -28,7 +24,7 @@ export class InteractionService {
         this._loggerService.info((`[postInteraction] - Init time: ${new Date().toISOString()}`));
         await this.ensureCollection(model);
         const response = await this.sendToOllama(userId, userMessage, model);
-        const fullTurn = `User: ${userMessage}\nSofia: ${response}`;
+        const fullTurn = `User: ${userMessage}\nKasumi: ${response}`;
         const embedding = await this.getEmbedding(fullTurn);
         const collection = await this.chroma.getCollection({ name: this.collectionName });
 
@@ -70,35 +66,6 @@ export class InteractionService {
 
         return data.embedding;
     }
-
-    // private async getContext(userId: string, query: string): Promise<string[]> {
-    //     this._loggerService.info(`[getContext] - userId: ${userId} - query: ${query.slice(0, 10)}...`)
-    //     const embedding = await this.getEmbedding(query);
-    //     if (!Array.isArray(embedding) || embedding.length < 10) {
-    //         this._loggerService.warn(`[getContext] - Embeding invalido`)
-    //     };
-    //     this._loggerService.info(`[getContext] - embeding succesful`);
-
-    //     const collection = await this.chroma.getCollection({ name: this.collectionName });
-    //     this._loggerService.info(`[getContext] - chromaCollection ${collection}`);
-
-    //     const results = await collection.query({
-    //         queryEmbeddings: [embedding],
-    //         nResults: 5,
-    //         where: { userId },
-    //     });
-
-    //     const docs = results?.documents?.[0] || [];
-    //     const metas = results?.metadatas?.[0] || [];
-
-    //     console.log(docs.map((doc, i) => ({
-    //         text: doc,
-    //         timestamp: metas[i]?.createdAt || metas[i]?.timestamp || 'unknown',
-    //       })))
-
-
-    //     return results?.documents?.[0] || [];
-    // }
 
     private async getContext(userId: string, query: string): Promise<IChromaData[]> {
         this._loggerService.info(`[getContext] - userId: ${userId} - query: ${query.slice(0, 10)}...`)
