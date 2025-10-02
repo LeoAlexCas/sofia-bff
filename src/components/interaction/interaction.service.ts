@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { MODEL_COLLECTION_DICTIONARY } from '../../constants/model-collection.dictionary';
 import { ConfigService } from '@nestjs/config';
 import { IChromaData } from './models/choma-data.interface';
+import { SendEmoteService } from 'src/common/services/send-emote.service';
 
 @Injectable()
 export class InteractionService {
@@ -14,7 +15,8 @@ export class InteractionService {
 
     constructor(
         private readonly _loggerService: LoggerService,
-        private readonly _configService: ConfigService
+        private readonly _configService: ConfigService,
+        private readonly _sendEmoteService: SendEmoteService
     ) {
         this._loggerService.name('InteractionService')
     }
@@ -41,7 +43,10 @@ export class InteractionService {
         });
 
         this._loggerService.info((`[postInteraction] - Finish time: ${new Date().toISOString()}`));
-        return response;
+        const finalText = this._sendEmoteService.processLlmResponse(response);
+        const { text } = await finalText;
+        return text;
+        //return response;
     }
 
     private setCollectionName(model: string): void {
