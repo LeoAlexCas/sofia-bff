@@ -44,7 +44,9 @@ export class InteractionService {
 
         this._loggerService.info((`[postInteraction] - Finish time: ${new Date().toISOString()}`));
         const finalText = await this._sendEmoteService.processLlmResponse(response);
-        const { text } = finalText;
+        const { text, avatar_intent } = finalText;
+
+        this._loggerService.info(`[postInteraction] - Filtered text and avatar_intent. AVATAR_INTENT is: ${avatar_intent}`)
         return text;
         //return response;
     }

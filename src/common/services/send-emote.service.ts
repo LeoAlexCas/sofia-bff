@@ -80,6 +80,6 @@ export class SendEmoteService {
             this._loggerService.debug(`[VTS Timer] Emoción 'happy' reseteada a neutro.`);
         }, 5000);
         // 3. Devolver la respuesta textual al cliente
-        return { text: text.trim() };
+        return { text: text.trim(), avatar_intent };
     }
 }
