@@ -5,72 +5,71 @@ import { LoggerService } from 'src/components/ultils/logger-service';
 
 @Injectable()
 export class SendEmoteService {
-  // Inyección del servicio VTube Studio
-  constructor(
-    private readonly vtsApi: VtsApiService,
-    private readonly _loggerService: LoggerService
-    ) {}
+    // Inyección del servicio VTube Studio
+    constructor(
+        private readonly vtsApi: VtsApiService,
+        private readonly _loggerService: LoggerService
+    ) { }
 
-  public async processLlmResponse(llmResponse: string) {
-    // 1. Proceso RAG (asumimos que ya obtuviste la intención)
-    const avatar_intent = llmResponse[0] == "[" ? llmResponse.slice(1, llmResponse.indexOf("]")) : 'neutral';
-    const text = llmResponse.slice(llmResponse.indexOf("]") + 1, llmResponse.length);
-    //const { text, avatar_intent } = llmResponse;
-    this._loggerService.info(`Intención detectada: ${avatar_intent}`);
-    // 2. Lógica de Mapeo:
-    switch (avatar_intent) {
-        case 'happy':
-            // Alegría General
-            this.vtsApi.injectParameterData('MouthSmile', 1.0);
-            this.vtsApi.injectParameterData('EyeOpen', 0.8);
-            this.vtsApi.injectParameterData('EyeOpenR', 0.8);
-            this.vtsApi.injectParameterData('EyeOpenL', 0.8);
-            break;
+    public async processLlmResponse(llmResponse: string) {
+        // 1. Proceso RAG (asumimos que ya obtuviste la intención)
+        const avatar_intent = llmResponse[0] == "[" ? llmResponse.slice(1, llmResponse.indexOf("]")) : 'neutral';
+        const text = llmResponse.slice(llmResponse.indexOf("]") + 1, llmResponse.length);
+        //const { text, avatar_intent } = llmResponse;
+        this._loggerService.info(`Intención detectada: ${avatar_intent}`);
+        // 2. Lógica de Mapeo:
+        switch (avatar_intent) {
+            case 'happy':
+                // Alegría General (Boca sonriente, Ojos abiertos)
+                this.vtsApi.injectParameterData('MouthSmile', 1.0); // Sonrisa máxima
+                this.vtsApi.injectParameterData('EyeOpen', 1.0);    // Ojos completamente abiertos
+                this.vtsApi.injectParameterData('FaceAngleY', 0.0); // Resetear cualquier giro de cabeza
+                break;
 
-        case 'sad':
-            // Tristeza
-            this.vtsApi.injectParameterData('MouthSmile', 0.0);
-            this.vtsApi.injectParameterData('MouthOpen', 0.1); // Boca ligeramente caída
-            this.vtsApi.injectParameterData('ParamTear', 1.0); // Parámetro custom/común para lágrima
-            this.vtsApi.injectParameterData('BrowSad', 1.0);   // Cejas hacia abajo
-            break;
+            case 'sad':
+                // Tristeza (Boca caída, Ojos entrecerrados ligeramente)
+                this.vtsApi.injectParameterData('MouthSmile', 0.0); // No sonreír
+                this.vtsApi.injectParameterData('MouthOpen', 0.1);  // Boca ligeramente abierta/caída
+                this.vtsApi.injectParameterData('EyeOpen', 0.8);    // Ojos menos abiertos (como pena)
+                this.vtsApi.injectParameterData('FaceAngleX', 5.0); // Cabeza ladeada (expresión de pena sutil)
+                break;
 
-        case 'surprised':
-            // Sorpresa 😲
-            this.vtsApi.injectParameterData('MouthOpen', 1.0); // Boca bien abierta (forma de 'O')
-            this.vtsApi.injectParameterData('EyeOpen', 1.2);   // Ojos muy abiertos (a veces valores > 1 para max)
-            this.vtsApi.injectParameterData('BrowUp', 1.0);    // Cejas levantadas
-            this.vtsApi.injectParameterData('BodyAngleZ', 5.0); // Movimiento sutil hacia atrás (opcional)
-            break;
+            case 'surprised':
+                // Sorpresa 😲 (Boca abierta, Ojos muy abiertos, Cabeza hacia atrás)
+                this.vtsApi.injectParameterData('MouthOpen', 1.0);  // Boca muy abierta
+                this.vtsApi.injectParameterData('MouthSmile', 0.0); // Boca redonda, no sonriente
+                this.vtsApi.injectParameterData('EyeOpen', 1.2);    // Ojos súper abiertos (usando valor > 1.0 para exagerar)
+                this.vtsApi.injectParameterData('FaceAngleX', 0.0); // Resetear ladear
+                this.vtsApi.injectParameterData('FaceAngleZ', 8.0); // Cabeza ligeramente inclinada hacia atrás
+                break;
 
-        case 'angry':
-            // Enojo/Frustración 😠
-            this.vtsApi.injectParameterData('BrowAngry', 1.0);  // Cejas fruncidas
-            this.vtsApi.injectParameterData('EyeOpen', 0.7);    // Ojos ligeramente entrecerrados
-            this.vtsApi.injectParameterData('MouthOpen', 0.0);  // Boca cerrada o apretada
-            this.vtsApi.injectParameterData('BodyAngleX', 8.0); // Inclinación brusca (opcional: movimiento de "rabia")
-            break;
+            case 'angry':
+                // Enojo/Frustración 😠 (Boca cerrada, Ojos entrecerrados)
+                this.vtsApi.injectParameterData('MouthOpen', 0.0);   // Boca cerrada
+                this.vtsApi.injectParameterData('MouthSmile', 0.0);  // No sonreír
+                this.vtsApi.injectParameterData('EyeOpen', 0.7);     // Ojos apretados (entrecejo)
+                this.vtsApi.injectParameterData('FaceAngleX', -8.0); // Sacudida/inclinación de cabeza (expresando enfado)
+                break;
 
-        case 'laughing':
-            // Risa / Alegría intensa 😂
-            this.vtsApi.injectParameterData('MouthOpen', 0.8);  // Boca abierta (para reír)
-            this.vtsApi.injectParameterData('MouthSmile', 1.0); // Forma de sonrisa máxima
-            this.vtsApi.injectParameterData('EyeSquint', 1.0);  // Ojos entrecerrados por la risa (o 'ParamEyeClose' si lo tienes)
-            break;
+            case 'laughing':
+                // Risa intensa 😂 (Combinación de boca abierta y forma de sonrisa)
+                this.vtsApi.injectParameterData('MouthOpen', 0.8);   // Boca abierta para el sonido
+                this.vtsApi.injectParameterData('MouthSmile', 1.0);  // Forma de risa
+                this.vtsApi.injectParameterData('EyeOpen', 0.8);     // Ojos entrecerrados por la risa
+                break;
 
-        case 'neutral':
-        default:
-            // Estado por defecto: Limpiar inyecciones y volver a neutral
-            this.vtsApi.injectParameterData('MouthSmile', 0.0);
-            this.vtsApi.injectParameterData('MouthOpen', 0.0);
-            this.vtsApi.injectParameterData('BrowAngry', 0.0);
-            this.vtsApi.injectParameterData('BrowUp', 0.0);
-            this.vtsApi.injectParameterData('EyeOpen', 1.0);
-            this.vtsApi.injectParameterData('BodyAngleX', 0.0);
-            this.vtsApi.injectParameterData('BodyAngleZ', 0.0);
-            break;
+            case 'neutral':
+            default:
+                // Estado de Reposo: Limpiar todas las inyecciones
+                this.vtsApi.injectParameterData('MouthSmile', 0.0);
+                this.vtsApi.injectParameterData('MouthOpen', 0.0);
+                this.vtsApi.injectParameterData('EyeOpen', 1.0);
+                this.vtsApi.injectParameterData('FaceAngleX', 0.0);
+                this.vtsApi.injectParameterData('FaceAngleY', 0.0);
+                this.vtsApi.injectParameterData('FaceAngleZ', 0.0);
+                break;
+        }
+        // 3. Devolver la respuesta textual al cliente
+        return { text: text.trim() };
     }
-    // 3. Devolver la respuesta textual al cliente
-    return { text: text.trim() };
-  }
 }
