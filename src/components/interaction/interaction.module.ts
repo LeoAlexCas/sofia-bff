@@ -3,12 +3,16 @@ import { InteractionService } from './interaction.service';
 import { InteractionController } from './interaction.controller';
 import { InteractionHandler } from './interaction.handler';
 import { LoggerService } from '../ultils/logger-service';
+import { SendEmoteService } from 'src/common/services/send-emote.service';
+import { VtsApiService } from 'src/common/services/vts-api.service';
 
 @Module({
   providers: [
     InteractionService,
     InteractionHandler,
-    LoggerService
+    LoggerService,
+    SendEmoteService,
+    VtsApiService
   ],
   controllers: [InteractionController]
 })
