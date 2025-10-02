@@ -43,8 +43,8 @@ export class InteractionService {
         });
 
         this._loggerService.info((`[postInteraction] - Finish time: ${new Date().toISOString()}`));
-        const finalText = this._sendEmoteService.processLlmResponse(response);
-        const { text } = await finalText;
+        const finalText = await this._sendEmoteService.processLlmResponse(response);
+        const { text } = finalText;
         return text;
         //return response;
     }

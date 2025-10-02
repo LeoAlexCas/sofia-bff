@@ -68,7 +68,17 @@ export class SendEmoteService {
                 this.vtsApi.injectParameterData('FaceAngleY', 0.0);
                 this.vtsApi.injectParameterData('FaceAngleZ', 0.0);
                 break;
-        }
+        };
+
+        setTimeout(() => {
+            this.vtsApi.injectParameterData('MouthSmile', 0.0);
+            this.vtsApi.injectParameterData('MouthOpen', 0.0);
+            this.vtsApi.injectParameterData('EyeOpen', 1.0);
+            this.vtsApi.injectParameterData('FaceAngleX', 0.0);
+            this.vtsApi.injectParameterData('FaceAngleY', 0.0);
+            this.vtsApi.injectParameterData('FaceAngleZ', 0.0);
+            this._loggerService.debug(`[VTS Timer] Emoción 'happy' reseteada a neutro.`);
+        }, 5000);
         // 3. Devolver la respuesta textual al cliente
         return { text: text.trim() };
     }
