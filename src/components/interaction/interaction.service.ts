@@ -3,7 +3,7 @@ import { LoggerService } from '../ultils/logger-service';
 import { ChromaClient } from 'chromadb';
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
-import { MODEL_COLLECTION_DICTIONARY } from '../constants/model-collection.dictionary';
+import { MODEL_COLLECTION_DICTIONARY } from '../../constants/model-collection.dictionary';
 import { ConfigService } from '@nestjs/config';
 import { IChromaData } from './models/choma-data.interface';
 

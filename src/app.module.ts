@@ -3,7 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { InteractionModule } from './components/interaction/interaction.module';
 import { ConfigModule } from '@nestjs/config';
-import { VALIDATION_SCHEMA } from './components/core/env.validation';
+import { VALIDATION_SCHEMA } from './core/env.validation';
 import { DataInjectModule } from './components/data-inject/data-inject.module';
 
 @Module({

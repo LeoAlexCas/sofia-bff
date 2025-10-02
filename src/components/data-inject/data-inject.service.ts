@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { LoggerService } from "../ultils/logger-service";
 import { ConfigService } from "@nestjs/config";
 import { ChromaClient, Metadata } from "chromadb";
-import { MODEL_COLLECTION_DICTIONARY } from "../constants/model-collection.dictionary";
+import { MODEL_COLLECTION_DICTIONARY } from "../../constants/model-collection.dictionary";
 import * as fs from 'fs';
 import * as path from 'path';
 import axios from "axios";
