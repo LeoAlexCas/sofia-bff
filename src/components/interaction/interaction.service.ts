@@ -26,7 +26,7 @@ export class InteractionService {
         this._loggerService.info((`[postInteraction] - Init time: ${new Date().toISOString()}`));
         await this.ensureCollection(model);
         const response = await this.sendToOllama(userId, userMessage, model);
-        const fullTurn = `User: ${userMessage}\nKasumi: ${response}`;
+        const fullTurn = `User: ${userMessage}\nSophia: ${response}`;
         const embedding = await this.getEmbedding(fullTurn);
         const collection = await this.chroma.getCollection({ name: this.collectionName });
 
@@ -43,12 +43,12 @@ export class InteractionService {
         });
 
         this._loggerService.info((`[postInteraction] - Finish time: ${new Date().toISOString()}`));
-        const finalText = await this._sendEmoteService.processLlmResponse(response);
-        const { text, avatar_intent } = finalText;
+        //const finalText = await this._sendEmoteService.processLlmResponse(response);
+        //const { text, avatar_intent } = finalText;
 
-        this._loggerService.info(`[postInteraction] - Filtered text and avatar_intent. AVATAR_INTENT is: ${avatar_intent}`)
-        return text;
-        //return response;
+        //this._loggerService.info(`[postInteraction] - Filtered text and avatar_intent. AVATAR_INTENT is: ${avatar_intent}`)
+        //return text;
+        return response;
     }
 
     private setCollectionName(model: string): void {

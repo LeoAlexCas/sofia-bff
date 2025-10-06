@@ -58,6 +58,24 @@ export class SendEmoteService {
                 this.vtsApi.injectParameterData('EyeOpen', 0.8);     // Ojos entrecerrados por la risa
                 break;
 
+            case 'amused':
+                // Divertido/Entretenido 😉 (Sonrisa sutil con un ligero guiño de cabeza)
+                this.vtsApi.injectParameterData('MouthSmile', 0.6);  // Media sonrisa
+                this.vtsApi.injectParameterData('EyeOpen', 1.0);     // Ojos normales
+                this.vtsApi.injectParameterData('FaceAngleX', 0.0);  // Resetear inclinación X
+                this.vtsApi.injectParameterData('FaceAngleZ', -4.0); // Ligera inclinación de cabeza (coqueto/interesado)
+                break;
+
+            case 'excited':
+                // Emocionado 🎉 (Boca de sorpresa/alegría, Ojos muy abiertos, Movimiento corporal)
+                this.vtsApi.injectParameterData('MouthOpen', 0.5);   // Boca ligeramente abierta
+                this.vtsApi.injectParameterData('MouthSmile', 0.8);  // Forma de sonrisa o exclamación
+                this.vtsApi.injectParameterData('EyeOpen', 1.2);     // Ojos súper abiertos (exageración)
+                this.vtsApi.injectParameterData('FaceAngleX', 10.0); // Inclinación fuerte (como un salto de emoción)
+                this.vtsApi.injectParameterData('FaceAngleY', 0.0);
+                this.vtsApi.injectParameterData('FaceAngleZ', 0.0);
+                break;
+
             case 'neutral':
             default:
                 // Estado de Reposo: Limpiar todas las inyecciones

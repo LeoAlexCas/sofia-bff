@@ -23,9 +23,7 @@ export class VtsApiService {
     private connect() {
         const url = this._configService.get<string>("URL_WS");
         const port = this._configService.get<string>("PORT_WS");
-        this.authToken = this._configService.get<string | null>("VTUBE_TOKEN")
-            ? this._configService.get<string | null>("VTUBE_TOKEN")
-            : null;
+        this.authToken = ""
 
         const websocketUrl = `${url}:${port}`;
         this.ws = new WebSocket(websocketUrl);
@@ -60,9 +58,11 @@ export class VtsApiService {
             data: {
                 pluginName: 'Sofia-bff',
                 pluginDeveloper: 'Alex AI',
-                authenticationToken: this.authToken || null, // Se usa null si es la primera vez
+                authenticationToken: this.authToken ? this.authToken : "", // Se usa null si es la primera vez
             },
         };
+        console.log("000000000000")
+        console.log(JSON.stringify(authRequest, null, 2))
         this.send(authRequest);
     }
 
