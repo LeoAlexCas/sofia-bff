@@ -13,7 +13,12 @@ export class SendEmoteService {
 
     public async processLlmResponse(llmResponse: string) {
         // 1. Proceso RAG (asumimos que ya obtuviste la intención)
-        const avatar_intent = llmResponse[0] == "[" ? llmResponse.slice(1, llmResponse.indexOf("]")) : 'neutral';
+        console.log("===========================")
+        console.log(llmResponse)
+        console.log(llmResponse.slice(1, llmResponse.indexOf("]")))
+        console.log(llmResponse.trim()[0])
+        console.log(llmResponse.trim()[0] == "[")
+        const avatar_intent = llmResponse.trim()[0] == "[" ? llmResponse.slice(1, llmResponse.indexOf("]")) : 'neutral';
         const text = llmResponse.slice(llmResponse.indexOf("]") + 1, llmResponse.length);
         //const { text, avatar_intent } = llmResponse;
         this._loggerService.info(`Intención detectada: ${avatar_intent}`);
@@ -95,7 +100,7 @@ export class SendEmoteService {
             this.vtsApi.injectParameterData('FaceAngleX', 0.0);
             this.vtsApi.injectParameterData('FaceAngleY', 0.0);
             this.vtsApi.injectParameterData('FaceAngleZ', 0.0);
-            this._loggerService.debug(`[VTS Timer] Emoción 'happy' reseteada a neutro.`);
+            this._loggerService.debug(`[VTS Timer] Emoción reseteada a neutro.`);
         }, 5000);
         // 3. Devolver la respuesta textual al cliente
         return { text: text.trim(), avatar_intent };

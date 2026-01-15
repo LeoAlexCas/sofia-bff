@@ -8,14 +8,14 @@ export class VtsApiService {
     private ws: WebSocket;
     private isAuthenticated = false;
     private messageCounter = 1;
-    private authToken: string | null;
+    private authToken: string | null = "0d10c26084309f3e3d2a82b6038cc85088c46d3a9b56249a74940774b9bfa639";
 
     constructor(
         private readonly _loggerService: LoggerService,
         private readonly _configService: ConfigService,
     ) {
         this._loggerService.name('VtsApiService');
-        this.connect();
+        //this.connect();
     };
 
     // --- 1. Conexión y Autenticación ---
@@ -51,14 +51,14 @@ export class VtsApiService {
 
     private authenticate() {
         const authRequest = {
-            apiName: 'VTubeStudioApi',
+            apiName: 'VTubeStudioPublicAPI',
             apiVersion: '1.0',
             requestID: `AuthReq-${this.messageCounter++}`,
-            messageType: 'AuthenticationRequest',
+            messageType: 'AuthenticationTokenRequest',
             data: {
                 pluginName: 'Sofia-bff',
                 pluginDeveloper: 'Alex AI',
-                authenticationToken: this.authToken ? this.authToken : "", // Se usa null si es la primera vez
+                //authenticationToken: this.authToken ? this.authToken : "", // Se usa null si es la primera vez
             },
         };
         console.log("000000000000")
@@ -103,7 +103,7 @@ export class VtsApiService {
     // Método para verificar la conexión
     private requestAPIState() {
         const stateRequest = {
-            apiName: 'VTubeStudioApi',
+            apiName: 'VTubeStudioPublicAPI',
             apiVersion: '1.0',
             requestID: `StateReq-${this.messageCounter++}`,
             messageType: 'ApiStateRequest',
@@ -121,7 +121,7 @@ export class VtsApiService {
         }
 
         const injectRequest = {
-            apiName: 'VTubeStudioApi',
+            apiName: 'VTubeStudioPublicAPI',
             apiVersion: '1.0',
             requestID: `InjectReq-${this.messageCounter++}`,
             messageType: 'InjectParameterDataRequest',
@@ -143,7 +143,7 @@ export class VtsApiService {
     // 1. Verificar Live2D Parameters del modelo (los que controlan el arte)
     public getModelLive2DParameters() {
         const request = {
-            apiName: 'VTubeStudioApi',
+            apiName: 'VTubeStudioPublicAPI',
             apiVersion: '1.0',
             requestID: `Live2DReq-${this.messageCounter++}`,
             messageType: 'Live2DParameterListRequest',
@@ -156,7 +156,7 @@ export class VtsApiService {
     // 2. Verificar Input Parameters (los que puedes inyectar)
     public getInputParameters() {
         const request = {
-            apiName: 'VTubeStudioApi',
+            apiName: 'VTubeStudioPublicAPI',
             apiVersion: '1.0',
             requestID: `InputReq-${this.messageCounter++}`,
             messageType: 'InputParameterListRequest',
