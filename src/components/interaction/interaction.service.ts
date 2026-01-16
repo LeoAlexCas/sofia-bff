@@ -26,7 +26,7 @@ export class InteractionService {
         this._loggerService.info((`[postInteraction] - Init time: ${new Date().toISOString()}`));
         await this.ensureCollection(model);
         const response = await this.sendToOllama(userId, userMessage, model);
-        const fullTurn = `User: ${userMessage}\nSophia: ${response}`;
+        const fullTurn = `User: ${userMessage}\nKasumi: ${response}`;
         const embedding = await this.getEmbedding(fullTurn);
         const collection = await this.chroma.getCollection({ name: this.collectionName });
 
@@ -109,6 +109,19 @@ export class InteractionService {
     private async sendToOllama(userId: string, prompt: string, model: string): Promise<string> {
         this._loggerService.info(`[sendToOllama] - Init post interaction - UserId: ${userId} - UserMessage: ${prompt.slice(0, 10)}... - Model: ${model}`)
         const contextDocs = await this.getContext(userId, prompt);
+        const cleanPrompt = prompt
+            .replace(/[\u00A0\u1680\u180E\u2000-\u200B\u202F\u205F\u3000\uFEFF]/g, ' ')
+            // 2. Normalizar comillas tipográficas (las que causan el ÔÇ£)
+            .replace(/[\u201C\u201D\u201E\u201F]/g, '"') // Comillas dobles
+            .replace(/[\u2018\u2019\u201A\u201B]/g, "'") // Comillas simples
+            // 3. Normalizar guiones y elipsis
+            .replace(/[\u2013\u2014]/g, '-')
+            .replace(/\u2026/g, '...')
+            // 4. Eliminar caracteres de control (ASCII 0-31) que suelen venir en copias de web
+            .replace(/[\x00-\x1F\x7F]/g, '')
+            // 5. El toque final: Eliminar cualquier carácter "huérfano" que no sea UTF-8 válido
+            .normalize('NFC')
+            .trim();
         const contextBlock = contextDocs.map(({ text, timestamp }) =>
             `- (${timestamp}) ${text}`
         ).join('\n');
@@ -121,7 +134,7 @@ MEMORY CONTEXT:
 ${contextBlock}
 
 USER:
-${prompt}
+${userId}: ${cleanPrompt}
 `;
 
         this._loggerService.info(`[sendToOllama] - full prompt is ${fullPrompt}`)
